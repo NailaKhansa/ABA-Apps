@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ABA">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Ayam Bakar Abang">
+<meta name="theme-color" content="#110800">
+<meta name="description" content="Aplikasi kasir Ayam Bakar Abang">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" href="/icon-192.png">
+<title>Ayam Bakar Abang</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #110800;
+    --surface: #1e1008;
+    --surface2: #2a1610;
+    --orange: #ff6b1a;
+    --orange-dim: #c44e0e;
+    --amber: #ffaa33;
+    --text: #f5e6d3;
+    --text-dim: #9e7d62;
+    --green: #4ecb71;
+    --red: #ff5252;
+    --border: #3a200e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #2a1000 0%, #1a0800 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--orange);
+    letter-spacing: -0.5px;
+  }
+  .brand span { color: var(--amber); }
+  .tanggal-now { font-size: 12px; color: var(--text-dim); }
+
+  /* ── INSTALL BANNER ── */
+  .install-banner {
+    display: none;
+    background: linear-gradient(90deg, #ff6b1a22, #ffaa3322);
+    border: 1px solid var(--orange);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    align-items: center;
+    gap: 10px;
+  }
+  .install-banner.show { display: flex; }
+  .install-banner-text { flex: 1; font-size: 13px; color: var(--text); }
+  .install-banner-text b { color: var(--amber); }
+  .btn-install {
+    background: var(--orange);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-dismiss {
+    background: none; border: none;
+    color: var(--text-dim); font-size: 18px;
+    cursor: pointer; padding: 0 4px; line-height: 1;
+  }
+
+  /* ── SUMMARY CARDS ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+  .card-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .card-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-value.green { color: var(--green); }
+  .card-value.amber { color: var(--amber); }
+  .card-value.orange { color: var(--orange); }
+  .card.loading .card-value { color: var(--text-dim); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── BODY ── */
+  .body { padding: 20px 16px 100px; }
+
+  /* ── TOGGLE JENIS ── */
+  .toggle-wrap {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 2px;
+  }
+  .toggle-btn {
+    flex: 1; border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 9px 4px; border-radius: 46px;
+    cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .toggle-btn.active { background: var(--orange); color: #fff; }
+
+  /* ── FORM ── */
+  .form-section { margin-bottom: 24px; }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 12px;
+    font-weight: 600; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px; padding: 14px 16px;
+    outline: none;
+    -webkit-appearance: none; appearance: none;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--orange); }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239e7d62' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
+  }
+  .field input[type="number"] { -moz-appearance: textfield; }
+  .field input[type="number"]::-webkit-outer-spin-button,
+  .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .nominal-wrap { position: relative; }
+  .nominal-prefix {
+    position: absolute; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px; color: var(--text-dim);
+    pointer-events: none; font-weight: 600;
+  }
+  .nominal-wrap input { padding-left: 44px; }
+
+  /* ── SUBMIT BTN ── */
+  .btn-simpan {
+    width: 100%; background: var(--orange);
+    border: none; border-radius: 14px;
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 17px; font-weight: 700;
+    padding: 18px; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-simpan:active { transform: scale(0.97); background: var(--orange-dim); }
+  .btn-simpan:disabled { background: var(--surface2); color: var(--text-dim); }
+
+  /* ── RIWAYAT ── */
+  .riwayat-section { margin-top: 28px; }
+  .section-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .riwayat-list { display: flex; flex-direction: column; gap: 8px; }
+  .riwayat-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeUp 0.3s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .riwayat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+  .riwayat-dot.income { background: var(--green); }
+  .riwayat-info { flex: 1; min-width: 0; }
+  .riwayat-label { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .riwayat-meta { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+  .riwayat-nominal { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .riwayat-nominal.expense { color: var(--red); }
+  .riwayat-nominal.income { color: var(--green); }
+  .riwayat-empty { text-align: center; color: var(--text-dim); font-size: 13px; padding: 20px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green); color: #0a2e15;
+    font-weight: 700; font-size: 14px;
+    padding: 14px 28px; border-radius: 50px;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999; white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); color: #fff; }
+
+  /* ── LOADING ── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(17,8,0,0.85);
+    display: flex; align-items: center;
+    justify-content: center; z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="brand">🔥 Ayam Bakar <span>Abang</span></div>
+    <div class="tanggal-now" id="tglNow"></div>
+  </div>
+
+  <!-- Install Banner -->
+  <div class="install-banner" id="installBanner">
+    <div class="install-banner-text">📲 <b>Install</b> biar kayak aplikasi!</div>
+    <button class="btn-install" id="btnInstall">Install</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">×</button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="card loading">
+      <div class="card-label">Sisa Deposit</div>
+      <div class="card-value" id="valDeposit">...</div>
+    </div>
+    <div class="card loading">
+      <div class="card-label">Net Profit Bulan Ini</div>
+      <div class="card-value green" id="valNetProfit">...</div>
+    </div>
+    <div class="card loading">
+      <div class="card-label">Profit Pending</div>
+      <div class="card-value amber" id="valPending">...</div>
+    </div>
+    <div class="card loading">
+      <div class="card-label">On Hand</div>
+      <div class="card-value orange" id="valOnHand">...</div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+  <!-- TOGGLE -->
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" onclick="setJenis('Pengeluaran')">Pengeluaran</button>
+    <button class="toggle-btn" onclick="setJenis('Pendapatan')">Pendapatan</button>
+    <button class="toggle-btn" onclick="setJenis('Deposit')">Deposit</button>
+    <button class="toggle-btn" onclick="setJenis('Cash Out')">Cash Out</button>
+  </div>
+
+  <!-- FORM PENGELUARAN -->
+  <div class="form-section" id="formPengeluaran">
+    <div class="field"><label>Tanggal</label><input type="date" id="tglPengeluaran"></div>
+    <div class="field"><label>Item / Keterangan</label><input type="text" id="itemPengeluaran" placeholder="Contoh: Gas LPG, Bumbu..."></div>
+    <div class="field"><label>Nominal</label><div class="nominal-wrap"><span class="nominal-prefix">Rp</span><input type="number" id="nominalPengeluaran" placeholder="0"></div></div>
+    <div class="field"><label>Buyer</label><select id="buyerPengeluaran"><option value="Novan">Novan</option><option value="Ibu">Ibu</option></select></div>
+    <button class="btn-simpan" onclick="simpan()">Simpan Pengeluaran</button>
+  </div>
+
+  <!-- FORM PENDAPATAN -->
+  <div class="form-section" id="formPendapatan" style="display:none">
+    <div class="field"><label>Tanggal</label><input type="date" id="tglPendapatan"></div>
+    <div class="field"><label>Nominal</label><div class="nominal-wrap"><span class="nominal-prefix">Rp</span><input type="number" id="nominalPendapatan" placeholder="0"></div></div>
+    <div class="field"><label>Jenis</label><select id="jenisPendapatan"><option value="Offline">Offline (Cash + QRIS)</option><option value="Online">Online (Delivery)</option></select></div>
+    <button class="btn-simpan" onclick="simpan()">Simpan Pendapatan</button>
+  </div>
+
+  <!-- FORM DEPOSIT -->
+  <div class="form-section" id="formDeposit" style="display:none">
+    <div class="field"><label>Tanggal</label><input type="date" id="tglDeposit"></div>
+    <div class="field"><label>Nominal</label><div class="nominal-wrap"><span class="nominal-prefix">Rp</span><input type="number" id="nominalDeposit" placeholder="0"></div></div>
+    <button class="btn-simpan" onclick="simpan()">Simpan Deposit</button>
+  </div>
+
+  <!-- FORM CASH OUT -->
+  <div class="form-section" id="formCashOut" style="display:none">
+    <div class="field"><label>Tanggal</label><input type="date" id="tglCashOut"></div>
+    <div class="field"><label>Nominal</label><div class="nominal-wrap"><span class="nominal-prefix">Rp</span><input type="number" id="nominalCashOut" placeholder="0"></div></div>
+    <div class="field"><label>Keterangan</label><input type="text" id="ketCashOut" placeholder="Opsional..."></div>
+    <button class="btn-simpan" onclick="simpan()">Simpan Cash Out</button>
+  </div>
+
+  <!-- RIWAYAT -->
+  <div class="riwayat-section" id="riwayatSection">
+    <div class="section-title">5 Terakhir</div>
+    <div class="riwayat-list" id="riwayatList"><div class="riwayat-empty">Memuat...</div></div>
+  </div>
+</div>
+
+<!-- OVERLAY & TOAST -->
+<div class="overlay" id="overlay"><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─────────────────────────────────────────
+  // GANTI URL INI dengan URL deployment Apps Script kamu!
+  // Contoh: https://script.google.com/macros/s/XXXX/exec
+  // ─────────────────────────────────────────
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbyESxERs9hy7Ga75JUc_46k3d1W4lsZsjiXyqiO8I3ZqUnNIZW7EZ0cQZQ0NHPqcZNC/exec';
+
+  var jenisAktif = 'Pengeluaran';
+
+  // ── INIT ──
+  window.onload = function() {
+    setTanggalHariIni();
+    setTglNow();
+    loadSummary();
+    loadRiwayat('Pengeluaran');
+    registerSW();
+    initInstall();
+  };
+
+  // ── SERVICE WORKER ──
+  function registerSW() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(e) {
+        console.log('SW register failed:', e);
+      });
+    }
+  }
+
+  // ── PWA INSTALL ──
+  var deferredPrompt = null;
+  function initInstall() {
+    // Kalau sudah standalone, sembunyikan
+    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) return;
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBanner').classList.add('show');
+    });
+
+    document.getElementById('btnInstall').addEventListener('click', function() {
+      if (!deferredPrompt) { showToast('Tap ⋮ → Add to Home Screen'); return; }
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(r) {
+        if (r.outcome === 'accepted') {
+          document.getElementById('installBanner').classList.remove('show');
+          showToast('✓ Berhasil diinstall!');
+        }
+        deferredPrompt = null;
+      });
+    });
+
+    window.addEventListener('appinstalled', function() {
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+
+  function dismissInstall() {
+    document.getElementById('installBanner').classList.remove('show');
+  }
+
+  // ── TANGGAL ──
+  function setTanggalHariIni() {
+    var today = todayStr();
+    ['tglPengeluaran','tglPendapatan','tglDeposit','tglCashOut'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = today;
+    });
+  }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function setTglNow() {
+    var hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    var bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    var d = new Date();
+    document.getElementById('tglNow').textContent = hari[d.getDay()]+', '+d.getDate()+' '+bln[d.getMonth()]+' '+d.getFullYear();
+  }
+
+  // ── TOGGLE ──
+  function setJenis(jenis) {
+    jenisAktif = jenis;
+    document.querySelectorAll('.toggle-btn').forEach(function(b) {
+      b.classList.toggle('active', b.textContent.trim() === jenis);
+    });
+    var forms = {'Pengeluaran':'formPengeluaran','Pendapatan':'formPendapatan','Deposit':'formDeposit','Cash Out':'formCashOut'};
+    Object.keys(forms).forEach(function(k) {
+      document.getElementById(forms[k]).style.display = (k === jenis) ? 'block' : 'none';
+    });
+    var riwSec = document.getElementById('riwayatSection');
+    if (jenis === 'Pengeluaran' || jenis === 'Pendapatan') {
+      riwSec.style.display = 'block'; loadRiwayat(jenis);
+    } else { riwSec.style.display = 'none'; }
+  }
+
+  // ── API CALL via fetch (bukan google.script.run) ──
+  function callAPI(action, params, onSuccess, onError) {
+    var url = GAS_URL + '?action=' + action;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(params)
+    })
+    .then(function(r) { return r.json(); })
+    .then(onSuccess)
+    .catch(onError || function(e) { console.error(e); });
+  }
+
+  // ── LOAD SUMMARY ──
+  function loadSummary() {
+    callAPI('getSummary', {}, function(data) {
+      if (data.error) return;
+      document.getElementById('valDeposit').textContent = formatRp(data.sisaDeposit);
+      document.getElementById('valNetProfit').textContent = formatRp(data.netProfit);
+      document.getElementById('valPending').textContent = formatRp(data.profitPending);
+      document.getElementById('valOnHand').textContent = formatRp(data.onHand);
+      document.querySelectorAll('.card').forEach(function(c){ c.classList.remove('loading'); });
+    });
+  }
+
+  // ── LOAD RIWAYAT ──
+  function loadRiwayat(jenis) {
+    var listEl = document.getElementById('riwayatList');
+    listEl.innerHTML = '<div class="riwayat-empty">Memuat...</div>';
+    callAPI('getRecent', {jenis: jenis}, function(rows) {
+      renderRiwayat(rows, jenis);
+    }, function() {
+      listEl.innerHTML = '<div class="riwayat-empty">Gagal memuat</div>';
+    });
+  }
+
+  function renderRiwayat(rows, jenis) {
+    var listEl = document.getElementById('riwayatList');
+    if (!rows || rows.length === 0) { listEl.innerHTML = '<div class="riwayat-empty">Belum ada transaksi</div>'; return; }
+    var isIncome = (jenis === 'Pendapatan');
+    var html = '';
+    rows.forEach(function(r, i) {
+      html += '<div class="riwayat-item" style="animation-delay:' + (i*0.05) + 's">' +
+        '<div class="riwayat-dot'+(isIncome?' income':'')+'"></div>' +
+        '<div class="riwayat-info"><div class="riwayat-label">'+escHtml(r.label)+'</div>' +
+        '<div class="riwayat-meta">'+escHtml(r.tanggal)+(r.sub?' · '+escHtml(r.sub):'')+'</div></div>' +
+        '<div class="riwayat-nominal '+(isIncome?'income':'expense')+'">'+(isIncome?'+':'-')+formatRp(r.nominal)+'</div>' +
+      '</div>';
+    });
+    listEl.innerHTML = html;
+  }
+
+  // ── SIMPAN ──
+  function simpan() {
+    var data = { jenis: jenisAktif };
+    if (jenisAktif === 'Pengeluaran') {
+      data.tanggal = document.getElementById('tglPengeluaran').value;
+      data.item = document.getElementById('itemPengeluaran').value.trim();
+      data.nominal = document.getElementById('nominalPengeluaran').value;
+      data.buyer = document.getElementById('buyerPengeluaran').value;
+      if (!data.tanggal || !data.nominal) { showToast('Lengkapi tanggal & nominal!', true); return; }
+    } else if (jenisAktif === 'Pendapatan') {
+      data.tanggal = document.getElementById('tglPendapatan').value;
+      data.nominal = document.getElementById('nominalPendapatan').value;
+      data.subJenis = document.getElementById('jenisPendapatan').value;
+      if (!data.tanggal || !data.nominal) { showToast('Lengkapi tanggal & nominal!', true); return; }
+    } else if (jenisAktif === 'Deposit') {
+      data.tanggal = document.getElementById('tglDeposit').value;
+      data.nominal = document.getElementById('nominalDeposit').value;
+      if (!data.tanggal || !data.nominal) { showToast('Lengkapi tanggal & nominal!', true); return; }
+    } else if (jenisAktif === 'Cash Out') {
+      data.tanggal = document.getElementById('tglCashOut').value;
+      data.nominal = document.getElementById('nominalCashOut').value;
+      data.keterangan = document.getElementById('ketCashOut').value.trim();
+      if (!data.tanggal || !data.nominal) { showToast('Lengkapi tanggal & nominal!', true); return; }
+    }
+
+    showOverlay(true);
+    callAPI('simpanTransaksi', data, function(res) {
+      showOverlay(false);
+      if (res.ok) {
+        showToast('✓ ' + res.msg);
+        resetForm(jenisAktif);
+        loadSummary();
+        if (jenisAktif === 'Pengeluaran' || jenisAktif === 'Pendapatan') loadRiwayat(jenisAktif);
+      } else { showToast('❌ ' + res.msg, true); }
+    }, function(e) {
+      showOverlay(false);
+      showToast('❌ Gagal koneksi', true);
+    });
+  }
+
+  function resetForm(jenis) {
+    var today = todayStr();
+    if (jenis === 'Pengeluaran') {
+      document.getElementById('itemPengeluaran').value = '';
+      document.getElementById('nominalPengeluaran').value = '';
+      document.getElementById('tglPengeluaran').value = today;
+    } else if (jenis === 'Pendapatan') {
+      document.getElementById('nominalPendapatan').value = '';
+      document.getElementById('tglPendapatan').value = today;
+    } else if (jenis === 'Deposit') {
+      document.getElementById('nominalDeposit').value = '';
+      document.getElementById('tglDeposit').value = today;
+    } else if (jenis === 'Cash Out') {
+      document.getElementById('nominalCashOut').value = '';
+      document.getElementById('ketCashOut').value = '';
+      document.getElementById('tglCashOut').value = today;
+    }
+  }
+
+  // ── HELPERS ──
+  function formatRp(val) {
+    if (val === null || val === undefined || val === '') return 'Rp 0';
+    var num = parseFloat(String(val).replace(/[^0-9.-]/g,'')) || 0;
+    if (Math.abs(num) >= 1000000) return 'Rp ' + (num/1000000).toFixed(1).replace('.0','') + 'jt';
+    return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+  }
+  function escHtml(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function showToast(msg, isError) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast'+(isError?' error':'')+' show';
+    setTimeout(function(){ t.classList.remove('show'); }, 2800);
+  }
+  function showOverlay(show) {
+    document.getElementById('overlay').classList.toggle('show', show);
+  }
+</script>
+</body>
+</html>
